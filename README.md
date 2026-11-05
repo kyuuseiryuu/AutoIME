@@ -14,13 +14,23 @@ Automatic Input Method Switcher for Windows based on AutoHotkey v2.
 
 AutoIME is a background utility for Windows that automatically switches input method editors (IMEs) and keyboard layouts based on the focused application window. It listens directly to Windows foreground activation events (`EVENT_SYSTEM_FOREGROUND`) via native Win32 event hooks—delivering instantaneous, zero-polling, zero-latency layout switching with zero idle CPU overhead.
 
+## Screenshots
+
+### Configuration Window
+
+![Configuration Window](screenshots/ui-config.png)
+
+### System Tray Menu
+
+![System Tray Menu](screenshots/ui-tray.png)
+
 ## Features
 
 - **Process-Based Layout Switching**: Automatically applies the configured IME or keyboard layout when a target executable gains focus.
 - **System Layout Enumeration**: Dynamically retrieves installed system keyboard layouts and IMEs from the Win32 API and registry, generating individual tabs for each layout.
 - **Window Capture Mode**: Inspects the window under the mouse cursor in real time to capture process names and titles, allowing direct rule creation by clicking or pressing confirmation keys.
 - **Interactive Hotkey Configuration**: Dedicated dialog that captures physical key combinations (`Ctrl`, `Alt`, `Shift`, `Win` + any key) to set the global activation hotkey (default: `Ctrl+Alt+I`).
-- **Trilingual User Interface**: Built-in support for English, Simplified Chinese, and Japanese with instant runtime switching. New languages can be added simply by creating an INI file under the `lang/` directory.
+- **Trilingual User Interface & i18n Architecture**: Built-in support for English, Simplified Chinese, and Japanese with instant runtime switching. AutoIME includes embedded English fallbacks and allows adding new languages simply by dropping an INI file under the `lang/` directory (see [Localization Guide](lang/README.md)).
 - **System Tray Integration**: Operates in the system tray with controls for opening settings, reloading configuration, toggling ToolTip hints, and managing startup status.
 - **Windows Startup Support**: Toggles automatic execution on user login by managing a shortcut in the standard Windows Startup directory (`shell:startup`) without modifying registry entries.
 - **Conflict Handling**: Prompts for confirmation when attempting to assign a process that is already registered under another layout.
@@ -97,7 +107,11 @@ An example configuration file is provided in [`AutoIME_config.example.ini`](Auto
 
 ```text
 AutoIME/
+├── screenshots/
+│   └── ui-tray.png               # System tray menu screenshot
+│   ├── ui-config.png             # Configuration window screenshot
 ├── lang/
+│   ├── README.md                 # Localization & language guide
 │   ├── en.ini                    # English language file
 │   ├── ja.ini                    # Japanese language file
 │   └── zh.ini                    # Simplified Chinese language file
