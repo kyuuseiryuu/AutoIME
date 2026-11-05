@@ -31,7 +31,7 @@ AutoIME is a background utility for Windows that automatically switches input me
 - **Window Capture Mode**: Inspects the window under the mouse cursor in real time to capture process names and titles, allowing direct rule creation by clicking or pressing confirmation keys.
 - **Interactive Hotkey Configuration**: Dedicated dialog that captures physical key combinations (`Ctrl`, `Alt`, `Shift`, `Win` + any key) to set the global activation hotkey (default: `Ctrl+Alt+I`).
 - **Trilingual User Interface & i18n Architecture**: Built-in support for English, Simplified Chinese, and Japanese with instant runtime switching. AutoIME includes embedded English fallbacks and allows adding new languages simply by dropping an INI file under the `lang/` directory (see [Localization Guide](lang/README.md)).
-- **System Tray Integration**: Operates in the system tray with controls for opening settings, reloading configuration, toggling ToolTip hints, and managing startup status.
+- **System Tray Integration**: Operates in the system tray with quick access to configuration, reloading rules, toggling ToolTip hints, startup management, GitHub updates, and one-click process restart.
 - **Windows Startup Support**: Toggles automatic execution on user login by managing a shortcut in the standard Windows Startup directory (`shell:startup`) without modifying registry entries.
 - **Conflict Handling**: Prompts for confirmation when attempting to assign a process that is already registered under another layout.
 
@@ -46,7 +46,7 @@ AutoIME is a background utility for Windows that automatically switches input me
 
 1. Clone or download the repository:
    ```bash
-   git clone https://github.com/your-username/AutoIME.git
+   git clone https://github.com/kyuuseiryuu/AutoIME.git
    cd AutoIME
    ```
 2. Run `AutoIME.ahk` with AutoHotkey v2 installed.

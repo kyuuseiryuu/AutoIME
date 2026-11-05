@@ -21,6 +21,7 @@ DetectHiddenWindows(true) ; 开启：支持 IME 默认隐藏服务窗口
 global ConfigFile     := A_ScriptDir . "\AutoIME_config.ini"
 global LOG_FILE       := A_ScriptDir . "\AutoIME_debug.log"
 global LANG_DIR       := A_ScriptDir . "\lang"
+global PROJECT_URL    := "https://github.com/kyuuseiryuu/AutoIME"
 global DEBUG_MODE     := true
 global CurrentLang    := "en"      ; 界面语言代码 (默认为 en)
 global CurrentDict    := Map()     ; 当前语言字典
@@ -57,6 +58,8 @@ global TrayItem_Open      := ""
 global TrayItem_Reload    := ""
 global TrayItem_Debug     := ""
 global TrayItem_AutoStart := ""
+global TrayItem_Github    := ""
+global TrayItem_Restart   := ""
 global TrayItem_Exit      := ""
 
 ; ================== 2. 国际化 (i18n) 语言管理器 ==================
@@ -127,6 +130,8 @@ GetBuiltinEnglishDict() {
         "tray_reload_config", "🔄 Reload Config",
         "tray_toggle_debug", "💬 Toggle ToolTip Hints",
         "tray_toggle_startup", "🚀 Run on Startup",
+        "tray_github", "🌐 GitHub Repository (Check Updates)",
+        "tray_restart", "⚡ Restart AutoIME",
         "tray_exit", "❌ Exit AutoIME",
         "tray_tip_minimized", "AutoIME is minimized to tray and running in background.`nDouble-click tray icon or press activation hotkey to open settings.",
         "debug_enabled", "ToolTip hints enabled",
@@ -230,6 +235,8 @@ tray_open_config=⚙️ Open Settings ({1})
 tray_reload_config=🔄 Reload Config
 tray_toggle_debug=💬 Toggle ToolTip Hints
 tray_toggle_startup=🚀 Run on Startup
+tray_github=🌐 GitHub Repository (Check Updates)
+tray_restart=⚡ Restart AutoIME
 tray_exit=❌ Exit AutoIME
 tray_tip_minimized=AutoIME is minimized to tray and running in background.\nDouble-click tray icon or press activation hotkey to open settings.
 debug_enabled=ToolTip hints enabled
@@ -1455,12 +1462,15 @@ ReloadSystemImes() {
 ; ================== 12. 托盘菜单与交互 (支持 Checkmark 勾选标志) ==================
 
 InitTrayMenu() {
-    global TrayItem_Open, TrayItem_Reload, TrayItem_Debug, TrayItem_AutoStart, TrayItem_Exit, CurrentHotkey
+    global TrayItem_Open, TrayItem_Reload, TrayItem_Debug, TrayItem_AutoStart, TrayItem_Github, TrayItem_Restart, TrayItem_Exit, CurrentHotkey
+    global PROJECT_URL
     
     TrayItem_Open      := T("tray_open_config", FormatHotkeyDisplay(CurrentHotkey))
     TrayItem_Reload    := T("tray_reload_config")
     TrayItem_Debug     := T("tray_toggle_debug")
     TrayItem_AutoStart := T("tray_toggle_startup")
+    TrayItem_Github    := T("tray_github")
+    TrayItem_Restart   := T("tray_restart")
     TrayItem_Exit      := T("tray_exit")
     
     A_TrayMenu.Delete()
@@ -1474,6 +1484,9 @@ InitTrayMenu() {
     A_TrayMenu.Add(TrayItem_AutoStart, ToggleAutoStartFromTray)
     
     A_TrayMenu.Add()
+    A_TrayMenu.Add(TrayItem_Github, (*) => Run(PROJECT_URL))
+    A_TrayMenu.Add()
+    A_TrayMenu.Add(TrayItem_Restart, (*) => Reload())
     A_TrayMenu.Add(TrayItem_Exit, (*) => ExitApp())
     
     UpdateTrayMenuChecks()

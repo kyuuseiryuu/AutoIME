@@ -169,6 +169,8 @@ header_title=⚡ AutoIME - Commutateur automatique
 | `tray_reload_config` | `🔄 Reload Config` | - | 托盘右键菜单：重新加载配置 |
 | `tray_toggle_debug` | `💬 Toggle ToolTip Hints` | - | 托盘右键菜单：切换通知提示 |
 | `tray_toggle_startup` | `🚀 Run on Startup` | - | 托盘右键菜单：开机自启动开关 |
+| `tray_github` | `🌐 GitHub Repository (Check Updates)` | - | 托盘右键菜单：打开 GitHub 项目主页获取最新版本 |
+| `tray_restart` | `⚡ Restart AutoIME` | - | 托盘右键菜单：一键重启自身程序 |
 | `tray_exit` | `❌ Exit AutoIME` | - | 托盘右键菜单：退出程序 |
 | `tray_tip_minimized` | `AutoIME is minimized to tray and running in background.\nDouble-click tray icon or press activation hotkey to open settings.` | - | 首次最小化到托盘时的气泡引导 |
 | `debug_enabled` | `ToolTip hints enabled` | - | 切换通知开启状态提示 |
