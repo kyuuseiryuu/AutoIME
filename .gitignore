@@ -1,0 +1,50 @@
+# ==========================================
+# AutoIME - Git Ignore Rules
+# ==========================================
+
+# User Configuration & Local Settings
+# (Personalized mappings and preferences; use AutoIME_config.example.ini as template)
+AutoIME_config.ini
+*.ini
+!*.example.ini
+!*.template.ini
+!lang/
+!lang/*.ini
+
+# Logs & Debugging Output
+*.log
+AutoIME_debug.log
+ahk_err.log
+
+# Backups & Temporary Files
+*.bak
+*.ahk.bak
+*.tmp
+*~
+*.swp
+*.swo
+
+# Compiled Executables & Binaries (from Ahk2Exe)
+*.exe
+AutoIME.exe
+
+# Windows Shortcuts & System Files
+*.lnk
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+desktop.ini
+$RECYCLE.BIN/
+
+# macOS / Linux Metadata
+.DS_Store
+._*
+
+# IDEs & Editor Configurations
+.vscode/
+.idea/
+.vs/
+*.sublime-project
+*.sublime-workspace
+
