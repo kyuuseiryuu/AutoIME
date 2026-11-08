@@ -116,7 +116,19 @@ AutoIME/
 │   ├── en.ini                    # 英文语言包
 │   ├── ja.ini                    # 日文语言包
 │   └── zh.ini                    # 中文语言包
-├── AutoIME.ahk                   # 核心 AutoHotkey v2 脚本
+├── core/                         # 核心业务逻辑层
+│   ├── Globals.ahk               # 全局变量与配置状态
+│   ├── Logger.ahk                # 调试日志辅助
+│   ├── I18n.ahk                  # 国际化语言包与字典管理器
+│   ├── ImeEngine.ahk             # 系统输入法枚举与底层 IMM32 激活引擎
+│   ├── Config.ahk                # INI 读写、规则持久化与热键管理
+│   └── WindowWatcher.ahk         # WinEventHook 事件驱动窗口监听
+├── ui/                           # UI 交互层
+│   ├── HotkeyDialog.ahk          # 键盘组合键交互式设置弹窗
+│   ├── WindowCapture.ahk         # 🎯 靶心窗口捕获模式与鼠标钩子
+│   ├── TrayMenu.ahk              # 托盘图标菜单与开关状态同步
+│   └── ConfigGui.ahk             # 主配置窗口 (原生 Tab 页控件架构)
+├── AutoIME.ahk                   # 程序主入口脚本
 ├── AutoIME_config.example.ini    # 用户配置参考模板
 ├── LICENSE                       # MIT 开源许可证
 ├── README.md                     # 项目文档（英文主入口）

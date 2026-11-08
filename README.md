@@ -108,14 +108,26 @@ An example configuration file is provided in [`AutoIME_config.example.ini`](Auto
 ```text
 AutoIME/
 ├── screenshots/
-│   └── ui-tray.png               # System tray menu screenshot
-│   ├── ui-config.png             # Configuration window screenshot
+│   ├── ui-tray.png               # System tray menu screenshot
+│   └── ui-config.png             # Configuration window screenshot
 ├── lang/
 │   ├── README.md                 # Localization & language guide
 │   ├── en.ini                    # English language file
 │   ├── ja.ini                    # Japanese language file
 │   └── zh.ini                    # Simplified Chinese language file
-├── AutoIME.ahk                   # Main AutoHotkey v2 script
+├── core/                         # Core logic layer
+│   ├── Globals.ahk               # Global variables and configurations
+│   ├── Logger.ahk                # Debug logging helper
+│   ├── I18n.ahk                  # Localization & dictionary manager
+│   ├── ImeEngine.ahk             # System IME enumeration & IMM32 activation
+│   ├── Config.ahk                # INI reading/writing, rule persistence & hotkey
+│   └── WindowWatcher.ahk         # WinEventHook event-driven window listener
+├── ui/                           # User interface layer
+│   ├── HotkeyDialog.ahk          # Interactive hotkey configuration dialog
+│   ├── WindowCapture.ahk         # 🎯 Window target capture mode & mouse hook
+│   ├── TrayMenu.ahk              # System tray menu & toggle checks
+│   └── ConfigGui.ahk             # Main settings GUI (Native Tab3 architecture)
+├── AutoIME.ahk                   # Main entrypoint script
 ├── AutoIME_config.example.ini    # Example configuration template
 ├── LICENSE                       # MIT License
 ├── README.md                     # Documentation (English)

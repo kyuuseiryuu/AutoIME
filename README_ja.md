@@ -115,8 +115,20 @@ AutoIME/
 │   ├── README.md                 # 多言語設定・ローカライズガイド
 │   ├── en.ini                    # 英語言語ファイル
 │   ├── ja.ini                    # 日本語言語ファイル
-│   └── zh.ini                    # 中国語言語ファイル
-├── AutoIME.ahk                   # メイン AutoHotkey v2 スクリプト
+│   └── zh.ini                    # 中国語言语ファイル
+├── core/                         # コアロジック層
+│   ├── Globals.ahk               # グローバル変数・基本状態管理
+│   ├── Logger.ahk                # デバッグログ補助
+│   ├── I18n.ahk                  # 多言語・辞書マネージャー
+│   ├── ImeEngine.ahk             # システムIME列挙・IMM32切替エンジン
+│   ├── Config.ahk                # INI読込/保存・ルール永続化・ホットキー
+│   └── WindowWatcher.ahk         # WinEventHook イベント駆動ウィンドウ監視
+├── ui/                           # UI プレゼンテーション層
+│   ├── HotkeyDialog.ahk          # ホットキー対話型設定ダイアログ
+│   ├── WindowCapture.ahk         # 🎯 ターゲットウィンドウ取得モード
+│   ├── TrayMenu.ahk              # トレイメニュー・トグル状態同期
+│   └── ConfigGui.ahk             # メイン設定画面 (ネイティブTab3構造)
+├── AutoIME.ahk                   # メイン起動エントリスクリプト
 ├── AutoIME_config.example.ini    # 設定テンプレート
 ├── LICENSE                       # MIT ライセンス
 ├── README.md                     # プロジェクトドキュメント (英語・既定)
