@@ -5,7 +5,19 @@
 ; ==============================================================================
 
 LoadConfig() {
-    global SystemImes, AppToImeMap, ImeTabList, DEBUG_MODE, CurrentLang, CurrentHotkey, ConfigFile, AvailableLangs
+    global SystemImes, AppToImeMap, ImeTabList, DEBUG_MODE, CurrentLang, CurrentHotkey, CurrentTheme, CurrentVersion, CurrentCommit, ConfigFile, AvailableLangs
+
+    ; 读取 version.json 动态注入的版本信息
+    try {
+        vPath := A_ScriptDir . "\version.json"
+        if FileExist(vPath) {
+            vData := JSON.parse(FileRead(vPath))
+            if vData.Has("version") && vData["version"] != ""
+                CurrentVersion := vData["version"]
+            if vData.Has("commit") && vData["commit"] != ""
+                CurrentCommit := vData["commit"]
+        }
+    }
     
     SystemImes := GetSystemImeList()
     AppToImeMap := Map()
@@ -17,6 +29,9 @@ LoadConfig() {
     try savedHk := IniRead(ConfigFile, "Settings", "Hotkey", "^!i")
     if (savedHk != "")
         CurrentHotkey := savedHk
+
+    ; 读取主题模式 (system / light / dark)
+    try CurrentTheme := IniRead(ConfigFile, "Settings", "Theme", "system")
     
     ScanAvailableLanguages()
     
@@ -139,11 +154,12 @@ InitDefaultRules() {
 }
 
 SaveConfig(notify := true) {
-    global ImeTabList, AppToImeMap, DEBUG_MODE, CurrentLang, CurrentHotkey, ConfigFile
+    global ImeTabList, AppToImeMap, DEBUG_MODE, CurrentLang, CurrentHotkey, CurrentTheme, ConfigFile
     
     try IniWrite(DEBUG_MODE ? "1" : "0", ConfigFile, "Settings", "DebugMode")
     try IniWrite(CurrentLang, ConfigFile, "Settings", "Language")
     try IniWrite(CurrentHotkey, ConfigFile, "Settings", "Hotkey")
+    try IniWrite(CurrentTheme, ConfigFile, "Settings", "Theme")
     
     AppToImeMap := Map()
     for tab in ImeTabList {
@@ -192,19 +208,15 @@ ApplyHotkey(newHk, notify := true) {
 }
 
 ReloadSystemImes() {
-    global ConfigGui, MainTabCtrl, ImeTabList
-    savedTab := 1
-    if (IsSet(MainTabCtrl) && MainTabCtrl) {
-        try savedTab := MainTabCtrl.Value
-    }
+    global ConfigGui, wvCore, ImeTabList
     LoadConfig()
-    if (IsSet(ConfigGui) && ConfigGui) {
+    if (IsSet(wvCore) && wvCore) {
+        try wvCore.ExecuteScriptAsync("window.app && window.app.loadDataFromAhk()")
+    } else if (IsSet(ConfigGui) && ConfigGui) {
         ConfigGui.Destroy()
         ConfigGui := unset
+        ShowConfigGui(1)
     }
-    if (savedTab < 1 || savedTab > ImeTabList.Length)
-        savedTab := 1
-    ShowConfigGui(savedTab)
     ToolTip(T("ime_reloaded"))
     SetTimer(() => ToolTip(), -1500)
 }

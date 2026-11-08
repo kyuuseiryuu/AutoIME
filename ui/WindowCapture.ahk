@@ -8,10 +8,10 @@ StartWindowCapture(tabIdx := 0, *) {
     global isCapturing, captureTab, ConfigGui, MainTabCtrl, ImeTabList
     if isCapturing
         return
-    if (!tabIdx && IsSet(MainTabCtrl))
+    if (!tabIdx && IsSet(MainTabCtrl) && MainTabCtrl)
         tabIdx := MainTabCtrl.Value
     if (tabIdx < 1 || tabIdx > ImeTabList.Length)
-        return
+        tabIdx := 1
         
     isCapturing := true
     captureTab := tabIdx

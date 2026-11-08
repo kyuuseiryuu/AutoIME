@@ -28,6 +28,9 @@ ahk_err.log
 *.exe
 AutoIME.exe
 
+# Dynamic Link Libraries (Downloaded dynamically or packaged by CI)
+*.dll
+
 # Windows Shortcuts & System Files
 *.lnk
 Thumbs.db
@@ -47,4 +50,8 @@ $RECYCLE.BIN/
 .vs/
 *.sublime-project
 *.sublime-workspace
+
+# Node dependencies
+node_modules/
+
 

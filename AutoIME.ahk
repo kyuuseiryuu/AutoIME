@@ -28,6 +28,7 @@ DetectHiddenWindows(true) ; 开启：支持 IME 默认隐藏服务窗口
 #Include "core\ImeEngine.ahk"
 #Include "core\Config.ahk"
 #Include "core\WindowWatcher.ahk"
+#Include "core\Updater.ahk"
 
 ; 2. 引入 UI 视图层模块
 #Include "ui\HotkeyDialog.ahk"

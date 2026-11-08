@@ -1,10 +1,11 @@
 # AutoIME
 
-AutoHotkey v2 による Windows 向け入力方式（IME）およびキーボードレイアウト自動切替ツール。
+AutoHotkey v2 + Microsoft Edge WebView2 + React で構築された、モダンな Windows 向け入力方式（IME）・キーボードレイアウト自動切替ツール。
 
 [ [English](README.md) | [简体中文](README_zh.md) | 日本語 ]
 
 [![AutoHotkey v2](https://img.shields.io/badge/AutoHotkey-v2.0%2B-334455.svg?style=flat-square)](https://www.autohotkey.com/)
+[![React 19](https://img.shields.io/badge/React-19-61dafb.svg?style=flat-square)](https://react.dev/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%2F%2011-0078D6.svg?style=flat-square)](https://microsoft.com/windows)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 
@@ -12,137 +13,73 @@ AutoHotkey v2 による Windows 向け入力方式（IME）およびキーボー
 
 ## 概要
 
-AutoIME は、アクティブウィンドウのフォーカス変更を検知し、アプリケーションごとに割り当てられた入力方式（IME）またはキーボードレイアウトへ自動的に切り替える Windows 向け常駐ツールです。Win32 グローバルイベントフック（`SetWinEventHook`）により前台ウィンドウのアクティブ化イベントをリアルタイムに検知（周期ポーリング不要・0ms 瞬時応答・待機時 CPU 0%）し、登録されたプロセスに合致した場合に該当の入力方式へ即座に切り替えます。
+AutoIME は、アクティブな最前面ウィンドウに応じて入力方式（IME）やキーボード配列を自動的に切り替える Windows バックグラウンド常駐ユーティリティです。Win32 グローバルイベントフック（`SetWinEventHook`）により、ポーリング不要でゼロ遅延・低負荷な自動切り替えを実現します。
+
+最新バージョンでは **Microsoft Edge WebView2** と **React 19** を採用して UI を全面リニューアル。角丸カード、柔らかな多層シャドウ、ライト・ダーク・システム連動の3ステートテーマに対応しています。
 
 ## スクリーンショット
 
-### 設定画面
+| ダークモード | ライトモード |
+| :---: | :---: |
+| ![ダークモード](screenshots/autoime_react.png) | ![ライトモード](screenshots/autoime_light.png) |
 
-![設定画面](screenshots/ui-config.png)
-
-### タスクトレイメニュー
-
-![タスクトレイメニュー](screenshots/ui-tray.png)
+---
 
 ## 主な機能
 
-- **プロセス単位のレイアウト切替**：指定したプロセスがアクティブになった際、紐付けられた IME またはキーボードレイアウトへ自動切替。
-- **システムレイアウトの動的取得**：Win32 API およびレジストリからインストール済みの入力方式・キーボードレイアウトを自動抽出し、レイアウト別の設定タブを動的に生成。
-- **ウィンドウ取得モード**：マウスポインタ直下のウィンドウからプロセス名およびウィンドウタイトルをリアルタイムで取得し、クリックまたは確認キーでルールへ直接登録可能。
-- **インタラクティブなホットキー設定**：物理キーボードの押下を検出する設定ダイアログにより、任意のキーの組み合わせ（`Ctrl`、`Alt`、`Shift`、`Win` ＋ 任意のキー）で起動ショートカットキーを指定可能（既定値: `Ctrl+Alt+I`）。
-- **3言語対応と容易な拡張性**：英語、簡体字中国語、日本語に対応。言語定義は `lang/*.ini` ファイルとして独立管理されており、組み込みの英語フォールバックを備えています。スクリプト本体の改変なしに新たな言語パックを追加可能（詳細は [多言語設定ガイド](lang/README.md) を参照）。
-- **タスクトレイ常駐**：システムトレイに格納され、設定画面の表示、設定の再読み込み、切替通知（ToolTip）のオン／オフ、自動起動の状態切り替え、GitHub からの最新版取得、およびワンクリックでのプログラム再起動に対応。
-- **スタートアップ登録**：Windows のスタートアップディレクトリ（`shell:startup`）へのショートカット作成／削除により自動起動を制御。レジストリの改変は行いません。
-- **ルールの競合処理**：すでに他の入力方式に登録されているプロセスを追加しようとした場合、確認ダイアログを表示してワンクリックでの移動に対応。
+- **プロセス単位の自動切替**：対象アプリがアクティブになると同時に指定 IME へ自動切り替え。
+- **モダンな React UI**：WebView2 を利用した完全オフライン・高速動作のインターフェース。
+- **3つのテーマモード**：☀️ ライト、🌙 ダーク、💻 システム連動（Windows のテーマ変更をリアルタイム反映）。
+- **Git コミットハッシュ版番号とオンライン更新**：
+  - バージョン番号は GitHub の短縮コミットハッシュ（例：`v2.0 #896a76b`）を自動取得。
+  - ワンクリックでのアップデート確認と自動適用に対応（ユーザー設定 `AutoIME_config.ini` を保持）。
+- **システム IME の自動検出**：インストールされている言語とキーボードを自動列挙。
+- **ウィンドウキャプチャモード**：十字カーソルで目的のウィンドウをクリックするだけでルール追加。
+- **ショートカットキー録音**：物理キーの入力（Ctrl/Alt/Shift/Win＋任意キー）を直接検出して設定。
+- **一括操作と検索**：プロセス名検索、複数選択削除、タブ全消去に対応。
+- **多言語対応**：日本語、英語、簡体字中国語を標準搭載。
+- **GitHub Actions CI/CD**：push 時に実行に必要なファイルのみを厳選した Release zip を自動生成。
 
-## 動作要件
+---
 
-- **対応OS**：Windows 10 / Windows 11（64ビット／32ビット）
-- **ランタイム**：[AutoHotkey v2.0+](https://www.autohotkey.com/)（スクリプト直接実行時のみ必要）
+## インストールと起動
 
-## インストールと実行
+### 方法 1: リリース Zip をダウンロード (推奨)
 
-### スクリプトの直接実行
+1. GitHub Releases または Actions ページから最新の `AutoIME-<commit-hash>.zip` をダウンロードします。
+2. 任意のフォルダに展開し、`AutoIME.ahk` をダブルクリックして起動します。
 
-1. リポジトリをクローンまたはダウンロードします：
+### 方法 2: ソースコードから実行
+
+1. リポジトリをクローン：
    ```bash
    git clone https://github.com/kyuuseiryuu/AutoIME.git
    cd AutoIME
    ```
-2. AutoHotkey v2 がインストールされた環境で `AutoIME.ahk` を実行します。
+2. 依存関係と WebView2Loader.dll の取得：
+   ```bash
+   npm install
+   ```
+3. React バンドルをビルド：
+   ```bash
+   npm run build
+   ```
+4. `AutoIME.ahk` を実行します。
 
-### 実行ファイル (EXE) へのコンパイル
-
-AutoHotkey 未導入の環境で動作させる場合：
-1. AutoHotkey 付属のコンパイラ `Ahk2Exe` を起動します。
-2. **Source (script)** に `AutoIME.ahk` を指定します。
-3. **Destination (.exe)** に出力先（例: `AutoIME.exe`）を指定します。
-4. **Base File** に `AutoHotkey64.exe` (v2) を選択します。
-5. **Convert** をクリックして実行可能ファイルを生成します。
+---
 
 ## 使い方
 
-### プロセスルールの登録
+1. **設定画面を開く**：<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>I</kbd> を押すか、タスクトレイアイコンをダブルクリックします。
+2. **ルールの追加**：
+   - 対象 IME のタブを選択します。
+   - 【🎯 窗口捕获】（キャプチャ）、【📁 浏览EXE】（ファイル選択）、【➕ 手动添加】（手動入力）のいずれかで追加します。
+   - 【💾 保存并应用】をクリックして保存します。
+3. **テーマ変更**：右上の `☀️` / `🌙` / `💻` ボタンで切り替えます。
+4. **アップデート確認**：画面上のバージョンバッジ（例：`v2.0 #896a76b`）をクリックするか、トレイメニューの【🔄 アップデートを確認...】を選択します。
 
-1. <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>I</kbd> を押すか、タスクトレイアイコンをダブルクリックして設定画面を開きます。
-2. 対象とする入力方式のタブを選択します。
-3. 以下のいずれかの方法でプロセスを追加します：
-   - **ウィンドウ取得**：【🎯 ウィンドウ取得】をクリックし、対象アプリケーションのウィンドウにマウスを合わせて左クリック（または <kbd>Space</kbd> / <kbd>Enter</kbd> / <kbd>F8</kbd>）。キャンセルは <kbd>Esc</kbd>。
-   - **EXEを参照**：【📁 EXEを参照】をクリックし、ファイル選択画面から実行ファイルを選択。
-   - **手動追加**：【➕ 手動追加】をクリックし、プロセス名（例: `code.exe`）を直接入力。
-4. 【💾 保存して適用】をクリックして設定を保存します。
-
-### 主な操作一覧
-
-| 操作 / ショートカット | 機能 |
-| :--- | :--- |
-| <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>I</kbd> | 設定画面の表示／非表示（カスタマイズ可能） |
-| トレイアイコンのダブルクリック | 設定画面を表示 |
-| キャプチャ中に <kbd>Esc</kbd> | ウィンドウ取得モードを終了 |
-| キャプチャ中に <kbd>Space</kbd> / <kbd>Enter</kbd> / <kbd>F8</kbd> | ホバー中のウィンドウをルールとして追加 |
-
-## 設定ファイル仕様
-
-設定はスクリプトと同じディレクトリにある `AutoIME_config.ini`（UTF-16 LE）に保存されます。ファイルが存在しない場合、初回起動時に既定値と初期ルールが自動生成されます。
-
-```ini
-[Settings]
-DebugMode=0        ; 0: 通知無効 | 1: 切替時に ToolTip で通知表示
-Language=ja        ; 言語: ja (日本語) | en (英語) | zh (中国語)
-Hotkey=^!i         ; 起動キー仕様 (^=Ctrl, !=Alt, +=Shift, #=Win)
-
-[IME_0x04110411]   ; 入力方式の HKL 識別子 (例: 日本語)
-DisplayName=日本語 (Japanese)
-slack.exe=Slack
-line.exe=LINE
-
-[IME_0x04090409]   ; 入力方式の HKL 識別子 (例: 英語・米国)
-DisplayName=English (United States) - US
-code.exe=Visual Studio Code
-windowsterminal.exe=Windows Terminal
-```
-
-設定テンプレートは [`AutoIME_config.example.ini`](AutoIME_config.example.ini) を参照してください。
-
-## プロジェクト構成
-
-```text
-AutoIME/
-├── screenshots/
-│   ├── ui-config.png             # 設定画面スクリーンショット
-│   └── ui-tray.png               # タスクトレイメニュースクリーンショット
-├── lang/
-│   ├── README.md                 # 多言語設定・ローカライズガイド
-│   ├── en.ini                    # 英語言語ファイル
-│   ├── ja.ini                    # 日本語言語ファイル
-│   └── zh.ini                    # 中国語言语ファイル
-├── core/                         # コアロジック層
-│   ├── Globals.ahk               # グローバル変数・基本状態管理
-│   ├── Logger.ahk                # デバッグログ補助
-│   ├── I18n.ahk                  # 多言語・辞書マネージャー
-│   ├── ImeEngine.ahk             # システムIME列挙・IMM32切替エンジン
-│   ├── Config.ahk                # INI読込/保存・ルール永続化・ホットキー
-│   └── WindowWatcher.ahk         # WinEventHook イベント駆動ウィンドウ監視
-├── ui/                           # UI プレゼンテーション層
-│   ├── HotkeyDialog.ahk          # ホットキー対話型設定ダイアログ
-│   ├── WindowCapture.ahk         # 🎯 ターゲットウィンドウ取得モード
-│   ├── TrayMenu.ahk              # トレイメニュー・トグル状態同期
-│   └── ConfigGui.ahk             # メイン設定画面 (ネイティブTab3構造)
-├── AutoIME.ahk                   # メイン起動エントリスクリプト
-├── AutoIME_config.example.ini    # 設定テンプレート
-├── LICENSE                       # MIT ライセンス
-├── README.md                     # プロジェクトドキュメント (英語・既定)
-├── README_ja.md                  # プロジェクトドキュメント (日本語)
-└── README_zh.md                  # プロジェクトドキュメント (中国語)
-```
-
-## 技術仕様と注意点
-
-- **イベント駆動型フック**：Win32 ネイティブイベントフック（`SetWinEventHook` による `EVENT_SYSTEM_FOREGROUND = 0x0003` 監視）を採用。定期タイマーによるポーリングを排除し、待機時 CPU 使用率 0% および瞬時切替を実現しています。
-- **切替制御**：対象ウィンドウハンドルに対し、`PostMessageW` で `WM_INPUTLANGCHANGEREQUEST`（メッセージ番号 `0x0050`）を送信します。日本語（`0x0411`）、簡体字中国語（`0x0804`）および英語（`0x0409`）などの特定の入力方式においては、IMM32 API（`ImmGetDefaultIMEWnd`、`0x0283`）を用いて入力変換状態の開閉を制御します。
-- **権限境界 (UIPI)**：Windows の UIPI（ユーザインターフェース特権分離）により、通常権限のプロセスから管理者権限で実行されているウィンドウに対してメッセージを送信することはできません。管理者権限のアプリケーションに対しても切替を行う必要がある場合は、AutoIME を管理者として実行してください。
+---
 
 ## ライセンス
 
-本プロジェクトは [MIT License](LICENSE) のもとで公開されています。
-
+本ソフトウェアは [MIT License](LICENSE) の下で公開されています。

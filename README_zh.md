@@ -1,10 +1,11 @@
 # AutoIME
 
-基于 AutoHotkey v2 的 Windows 输入法与键盘布局自动切换工具。
+基于 AutoHotkey v2 + WebView2 + React 构建的现代化 Windows 输入法与键盘布局自动切换工具。
 
 [ [English](README.md) | 简体中文 | [日本語](README_ja.md) ]
 
 [![AutoHotkey v2](https://img.shields.io/badge/AutoHotkey-v2.0%2B-334455.svg?style=flat-square)](https://www.autohotkey.com/)
+[![React 19](https://img.shields.io/badge/React-19-61dafb.svg?style=flat-square)](https://react.dev/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%2F%2011-0078D6.svg?style=flat-square)](https://microsoft.com/windows)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 
@@ -12,137 +13,126 @@
 
 ## 概述
 
-AutoIME 是一个运行于 Windows 平台的后台辅助工具，用于根据当前前台活动窗口自动切换对应的输入法（IME）或键盘布局。程序通过 Win32 全局事件钩子（`SetWinEventHook`）实时响应系统前台窗口激活事件（零周期轮询唤醒、零延迟瞬时生效），并在检测到匹配规则的进程时，调用系统接口将输入法切换至目标状态。
+AutoIME 是一个运行于 Windows 平台的后台智能辅助工具，能够根据当前前台活动窗口自动切换对应的输入法（IME）或键盘布局。程序通过 Win32 全局事件钩子（`SetWinEventHook`）实时响应系统前台窗口激活事件（零周期轮询唤醒、零延迟瞬时生效），并在检测到匹配规则的进程时，调用底层 IMM32 接口将输入法无缝切换至目标状态。
+
+界面部分基于 **Microsoft Edge WebView2** 与 **React 19** 全新重构，兼具桌面级原生性能与现代 Fluent 视觉体验，支持浅色、深色及跟随系统外观。
 
 ## 界面预览
 
-### 规则配置界面
+| 深色模式 (Dark Mode) | 浅色模式 (Light Mode) |
+| :---: | :---: |
+| ![深色模式界面](screenshots/autoime_react.png) | ![浅色模式界面](screenshots/autoime_light.png) |
 
-![规则配置界面](screenshots/ui-config.png)
-
-### 系统托盘菜单
-
-![系统托盘菜单](screenshots/ui-tray.png)
+---
 
 ## 功能特性
 
 - **进程级别自动切换**：目标程序获得前台焦点时，自动切换至配置的输入法或键盘布局。
+- **现代化 React 界面**：基于 Microsoft Edge WebView2，纯本地打包离线运行，具备圆角卡片、柔和多层阴影与微动效。
+- **三态主题切换**：支持 ☀️ 浅色模式、🌙 深色模式与 💻 跟随系统（实时响应 Windows 系统深浅色外观变化）。
+- **版本号截取与在线更新**：
+  - 版本号与构建包基于 GitHub Short Commit Hash 自动截取标记（如 `v2.0 #896a76b`）。
+  - 支持**一键检查更新与静默在线更新**，自动下载最新版本并无缝覆盖（永久保留用户的 `AutoIME_config.ini` 配置）。
 - **系统布局动态枚举**：通过 Win32 API 与注册表读取当前系统已安装的键盘布局和输入法，自动生成对应的配置标签页。
-- **窗口捕获模式**：实时检测鼠标指针指向窗口的进程名与窗口标题，支持通过点击或快捷键直接添加为匹配规则。
-- **按键录制配置**：内置快捷键设置弹窗，实时监听键盘组合输入（支持 `Ctrl`、`Alt`、`Shift`、`Win` 与任意按键），用于配置全局唤醒快捷键（默认：`Ctrl+Alt+I`）。
-- **多语言与易扩展**：原生支持简体中文、英文与日语，可在界面中直接切换。多语言采用独立的 `lang/*.ini` 文件维护并内置英文兜底保障，添加新语种只需新增对应的 INI 语言包即可（详见 [多语言配置指南](lang/README.md)）。
-- **系统托盘集成**：支持最小化至系统托盘常驻运行，托盘右键菜单提供配置打开、重载、通知切换、开机自启管理、一键访问 GitHub 获取更新及一键重启自身程序。
-- **开机自启动管理**：通过在 Windows 用户启动目录（`shell:startup`）创建或移除快捷方式实现开机自启控制，不修改系统注册表。
-- **规则冲突处理**：当尝试向某输入法添加已绑定在其他输入法的进程时，弹出确认提示并支持一键迁移。
+- **窗口捕获模式**：点击【🎯 窗口捕获】后指向任意窗口，单击左键或按快捷键即可一键绑定规则。
+- **按键录制配置**：内置快捷键设置弹窗，实时监听物理键盘组合输入（支持 `Ctrl`、`Alt`、`Shift`、`Win` 与任意按键）。
+- **规则多选与批量操作**：支持按进程名模糊搜索、多选批量删除及清空当前列表。
+- **多语言原生支持**：支持简体中文、英文与日语，可在界面中直接切换。
+- **系统托盘集成**：支持最小化至系统托盘常驻运行，托盘右键菜单提供配置打开、重载、通知切换、开机自启管理、在线更新及重启。
+- **GitHub Actions CI 持续集成**：每次 push 提交自动触发自动化打包，仅提取运行时必需文件生成精简独立的 Release zip 包。
+
+---
 
 ## 运行环境
 
-- **操作系统**：Windows 10 / Windows 11（支持 64 位及 32 位）
-- **运行环境**：[AutoHotkey v2.0+](https://www.autohotkey.com/)（仅直接运行脚本时需要）
+- **操作系统**：Windows 10 / Windows 11（64 位推荐，同时支持 32 位）
+- **运行环境**：
+  - [AutoHotkey v2.0+](https://www.autohotkey.com/)
+  - Microsoft Edge WebView2 Runtime（Windows 10 现代版本及 Windows 11 已系统自带）
 
-## 安装与运行
+---
 
-### 直接运行脚本
+## 下载与运行
 
-1. 克隆或下载代码仓库：
+### 方式一：下载开箱即用发布包 (推荐)
+
+1. 前往 GitHub Releases 或 Actions 页面下载最新的 `AutoIME-<commit-hash>.zip`。
+2. 解压至任意文件夹，双击运行 `AutoIME.ahk` 即可启动。
+
+### 方式二：从源码运行与二次开发
+
+1. 克隆代码仓库：
    ```bash
    git clone https://github.com/kyuuseiryuu/AutoIME.git
    cd AutoIME
    ```
-2. 在已安装 AutoHotkey v2 的环境下直接运行 `AutoIME.ahk`。
+2. 安装前端构建依赖：
+   ```bash
+   npm install
+   ```
+   > `npm install` 会自动执行 `download-dll.js`，自动从官方 NuGet 包下载所需的 `WebView2Loader.dll`。
 
-### 编译为可执行文件 (EXE)
+3. 编译前端资源包：
+   ```bash
+   npm run build
+   ```
+   > 使用 esbuild 将 React 组件树一键打包为 `ui/html/app.bundle.js`，无外部网络依赖。
 
-如需在未安装 AutoHotkey 的设备上运行：
-1. 启动 AutoHotkey 自带的 `Ahk2Exe` 编译器；
-2. **Source (script)** 指定为 `AutoIME.ahk`；
-3. **Destination (.exe)** 指定为输出路径（如 `AutoIME.exe`）；
-4. **Base File** 选择 `AutoHotkey64.exe` (v2)；
-5. 点击 **Convert** 生成独立运行文件。
+4. 运行主脚本：
+   双击 `AutoIME.ahk` 启动程序。
 
-## 使用说明
+---
 
-### 添加进程规则
+## 使用指南
 
-1. 按下快捷键 <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>I</kbd> 或双击系统托盘图标打开配置窗口。
-2. 切换至目标输入法对应的标签页。
-3. 通过以下任意方式添加进程：
-   - **窗口捕获**：点击【🎯 窗口捕获】，将鼠标悬停在目标软件窗口上，单击鼠标左键（或按 <kbd>Space</kbd> / <kbd>Enter</kbd> / <kbd>F8</kbd>）确认；按 <kbd>Esc</kbd> 取消。
-   - **浏览 EXE**：点击【📁 浏览EXE】，通过文件对话框选择可执行文件。
-   - **手动添加**：点击【➕ 手动添加】，输入进程文件名（例如 `code.exe`）。
-4. 点击【💾 保存并应用】保存更改。
+### 1. 唤醒配置窗口
+- 默认唤醒快捷键：<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>I</kbd>（可在界面或托盘中自定义）。
+- 双击系统托盘右下角的 AutoIME 图标。
 
-### 常用快捷操作
+### 2. 绑定程序与输入法规则
+1. 切换至顶部对应的输入法标签页（如【微软拼音】或【English】）。
+2. 添加规则的三种方式：
+   - **🎯 窗口捕获**：点击后鼠标变为十字靶心，移动到目标软件窗口上方单击鼠标左键（或按 <kbd>Space</kbd> / <kbd>Enter</kbd>）即可捕获；按 <kbd>Esc</kbd> 退出捕获。
+   - **📁 浏览EXE**：通过文件管理器选择 `.exe` 可执行文件。
+   - **➕ 手动添加**：手动输入进程名称（支持自动补齐 `.exe` 后缀）与备注。
+3. 点击右下角【💾 保存并应用】即可立即生效。
 
-| 操作 / 按键 | 说明 |
-| :--- | :--- |
-| <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>I</kbd> | 打开或隐藏配置界面（可在界面中修改） |
-| 双击系统托盘图标 | 打开配置界面 |
-| 捕获模式下按 <kbd>Esc</kbd> | 退出捕获模式 |
-| 捕获模式下按 <kbd>Space</kbd> / <kbd>Enter</kbd> / <kbd>F8</kbd> | 确认添加当前鼠标悬停的窗口 |
+### 3. 外观主题切换
+点击右上角三态分段按钮切换界面主题：
+- `☀️` 浅色模式
+- `🌙` 深色模式
+- `💻` 跟随系统（随 Windows 主题实时自动适应）
 
-## 配置文件结构
+### 4. 检查更新与在线更新
+- **界面更新**：直接点击标题栏旁边的版本药丸徽章（如 `v2.0 #896a76b`），程序将自动联网比对 GitHub 最新发布与 Commit，发现新版本时弹出更新对话框，点击【立即更新】即可全自动静默升级并重启。
+- **托盘更新**：右键系统托盘图标，选择【🔄 检查更新...】。
 
-配置持久化保存在脚本同级目录下的 `AutoIME_config.ini` 中（编码为 UTF-16 LE）。若文件不存在，程序首次启动时会自动创建并写入推荐初始规则。
+---
+
+## 配置文件说明
+
+所有配置均持久化保存在脚本同级目录下的 `AutoIME_config.ini` 中：
 
 ```ini
 [Settings]
-DebugMode=0        ; 0: 关闭切换提示 | 1: 切换时显示 ToolTip 提示
+DebugMode=0        ; 0: 关闭提示 | 1: 切换窗口时右下角弹出 ToolTip 提示
 Language=zh        ; 界面语言: zh (中文) | en (英文) | ja (日文)
-Hotkey=^!i         ; 快捷键格式 (^=Ctrl, !=Alt, +=Shift, #=Win)
+Hotkey=^!i         ; 唤醒快捷键 (^=Ctrl, !=Alt, +=Shift, #=Win)
+Theme=system       ; 外观主题: system (跟随系统) | light (浅色) | dark (深色)
 
-[IME_0x08040804]   ; 布局 HKL 标识 (如 微软拼音)
+[IME_0x08040804]   ; 微软拼音输入法 HKL 标识
 DisplayName=中文(简体) - 微软拼音
 weixin.exe=微信
 qq.exe=QQ
 
-[IME_0x04090409]   ; 布局 HKL 标识 (如 美式键盘)
+[IME_0x04090409]   ; 英文键盘 HKL 标识
 DisplayName=English (美式键盘)
-code.exe=Visual Studio Code
+code.exe=VS Code
 windowsterminal.exe=Windows Terminal
 ```
 
-参考模板文件见 [`AutoIME_config.example.ini`](AutoIME_config.example.ini)。
+---
 
-## 项目文件结构
+## 许可证
 
-```text
-AutoIME/
-├── screenshots/
-│   ├── ui-config.png             # 配置界面截图
-│   └── ui-tray.png               # 托盘菜单截图
-├── lang/
-│   ├── README.md                 # 多语言配置与本地化指南
-│   ├── en.ini                    # 英文语言包
-│   ├── ja.ini                    # 日文语言包
-│   └── zh.ini                    # 中文语言包
-├── core/                         # 核心业务逻辑层
-│   ├── Globals.ahk               # 全局变量与配置状态
-│   ├── Logger.ahk                # 调试日志辅助
-│   ├── I18n.ahk                  # 国际化语言包与字典管理器
-│   ├── ImeEngine.ahk             # 系统输入法枚举与底层 IMM32 激活引擎
-│   ├── Config.ahk                # INI 读写、规则持久化与热键管理
-│   └── WindowWatcher.ahk         # WinEventHook 事件驱动窗口监听
-├── ui/                           # UI 交互层
-│   ├── HotkeyDialog.ahk          # 键盘组合键交互式设置弹窗
-│   ├── WindowCapture.ahk         # 🎯 靶心窗口捕获模式与鼠标钩子
-│   ├── TrayMenu.ahk              # 托盘图标菜单与开关状态同步
-│   └── ConfigGui.ahk             # 主配置窗口 (原生 Tab 页控件架构)
-├── AutoIME.ahk                   # 程序主入口脚本
-├── AutoIME_config.example.ini    # 用户配置参考模板
-├── LICENSE                       # MIT 开源许可证
-├── README.md                     # 项目文档（英文主入口）
-├── README_ja.md                  # 项目文档（日文）
-└── README_zh.md                  # 项目文档（中文）
-```
-
-## 技术实现细节
-
-- **事件驱动架构**：采用 Win32 原生事件钩子（`SetWinEventHook` 监听 `EVENT_SYSTEM_FOREGROUND = 0x0003`），彻底取代传统定时轮询机制，实现待机 0% CPU 占用与零延迟瞬发响应。
-- **切换接口**：通过 `PostMessageW` 向目标窗口句柄投递 `WM_INPUTLANGCHANGEREQUEST`（消息号 `0x0050`）。对于中文（`0x0804`）及美式英语（`0x0409`），通过 IMM32 接口获取默认 IME 窗口（`ImmGetDefaultIMEWnd`）并发送状态控制消息（`0x0283`），以调整中英文开闭状态。
-- **权限边界与 UIPI**：根据 Windows 用户界面特权隔离（UIPI）机制，低特权级别的进程无法向高特权级别（以管理员权限运行）的窗口发送消息。若需要对管理员权限运行的程序进行切换，需以管理员权限启动 AutoIME。
-
-## 开源协议
-
-本项目采用 [MIT License](LICENSE) 协议发布。
-
+本项目基于 [MIT License](LICENSE) 开源发布。

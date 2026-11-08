@@ -8,8 +8,13 @@ global ConfigFile     := A_ScriptDir . "\AutoIME_config.ini"
 global LOG_FILE       := A_ScriptDir . "\AutoIME_debug.log"
 global LANG_DIR       := A_ScriptDir . "\lang"
 global PROJECT_URL    := "https://github.com/kyuuseiryuu/AutoIME"
+global GITHUB_REPO    := "kyuuseiryuu/AutoIME"
+global GITHUB_API_URL := "https://api.github.com/repos/kyuuseiryuu/AutoIME"
+global CurrentVersion := "v2.0"
+global CurrentCommit  := "896a76b"   ; 默认或由 version.json / CI 注入
 global DEBUG_MODE     := true
 global CurrentLang    := "en"      ; 界面语言代码 (默认为 en)
+global CurrentTheme   := "system"  ; 界面主题模式 (system / light / dark)
 global CurrentDict    := Map()     ; 当前语言字典
 global FallbackDict   := Map()     ; 回退语言字典 (en)
 global AvailableLangs := []        ; 可用语言列表 [{ code, name, file }]
@@ -18,7 +23,9 @@ global SystemImes     := []        ; Array of { hkl, hklHex, displayName, langId
 global AppToImeMap    := Map()     ; Map(procName => { hkl, name })
 global ImeTabList     := []        ; Array of tab data with controls
 global ConfigGui      := unset     ; GUI 实例
-global MainTabCtrl    := unset     ; Tab 控件实例
+global MainTabCtrl    := unset     ; Tab 控件实例 (保持兼容性引用)
+global wvController   := unset     ; WebView2 Controller 实例
+global wvCore         := unset     ; WebView2 CoreWebView2 实例
 
 ; GUI 顶部与底部全局控件句柄（用于 Resize 动态布局）
 global txtTitleCtrl       := unset

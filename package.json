@@ -1,0 +1,32 @@
+{
+  "name": "autoime",
+  "version": "1.0.0",
+  "description": "Automatic Input Method Switcher for Windows based on AutoHotkey v2.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "postinstall": "node scripts/download-dll.js",
+    "setup:dll": "node scripts/download-dll.js",
+    "build": "node scripts/download-dll.js && node scripts/build.js",
+    "watch": "esbuild ui/src/index.jsx --bundle --outfile=ui/html/app.bundle.js --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kyuuseiryuu/AutoIME.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kyuuseiryuu/AutoIME/issues"
+  },
+  "homepage": "https://github.com/kyuuseiryuu/AutoIME#readme",
+  "dependencies": {
+    "esbuild": "^0.28.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  }
+}
