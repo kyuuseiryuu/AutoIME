@@ -97,3 +97,4 @@ ShowHotkeySettingDialog(parentHwnd) {
     
     dlg.Show("w420 h195 Center")
 }
+

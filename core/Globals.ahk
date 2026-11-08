@@ -47,3 +47,4 @@ global TrayItem_AutoStart := ""
 global TrayItem_Github    := ""
 global TrayItem_Restart   := ""
 global TrayItem_Exit      := ""
+

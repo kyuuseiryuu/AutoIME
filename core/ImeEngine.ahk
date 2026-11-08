@@ -138,3 +138,4 @@ SetImeOpenStatus(state, hwnd := 0) {
         DllCall("SendMessageW", "Ptr", imeHwnd, "UInt", 0x0283, "Ptr", 0x0006, "Ptr", state, "Ptr")
     }
 }
+

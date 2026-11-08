@@ -17,3 +17,4 @@ LogMessage(msg, showToolTip := true) {
         SetTimer(() => ToolTip(), -2000)
     }
 }
+

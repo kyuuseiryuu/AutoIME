@@ -77,3 +77,4 @@ WatchActiveWindow(targetHwnd := 0) {
     if (targetHwnd)
         ProcessWindowSwitch(targetHwnd)
 }
+

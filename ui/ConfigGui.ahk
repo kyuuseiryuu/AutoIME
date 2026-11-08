@@ -375,3 +375,4 @@ AddExeToTab(tabIdx, procName, remark := "") {
     SetTimer(() => ToolTip(), -2000)
     return true
 }
+

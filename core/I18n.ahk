@@ -331,3 +331,4 @@ FormatHotkeyDisplay(hk) {
     res .= (StrLen(work) == 1 ? StrUpper(work) : work)
     return res
 }
+

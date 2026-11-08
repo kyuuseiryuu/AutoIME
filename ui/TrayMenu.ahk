@@ -87,3 +87,4 @@ ToggleAutoStart(enable) {
         MsgBox(T("startup_failed", err.Message), "AutoIME", "Iconx")
     }
 }
+

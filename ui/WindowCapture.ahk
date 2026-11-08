@@ -130,3 +130,4 @@ OnCaptureCancelKey(ThisHotkey) {
     ToolTip(T("capture_cancelled"))
     SetTimer(() => ToolTip(), -1500)
 }
+
