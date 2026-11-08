@@ -4,6 +4,15 @@
 ; AutoIME - 在线更新与版本检测模块 (基于 GitHub API 发布时间与 Tag/Commit 双重校验)
 ; ==============================================================================
 
+IsoToTimestamp(isoStr) {
+    if (isoStr == "")
+        return 0
+    digits := RegExReplace(isoStr, "[^\d]", "")
+    if (StrLen(digits) < 14)
+        return 0
+    return Integer(SubStr(digits, 1, 14))
+}
+
 CheckForUpdatesOnline(isManual := true) {
     global CurrentVersion, CurrentCommit, CurrentBuildTime, GITHUB_REPO, GITHUB_API_URL
 
@@ -21,18 +30,19 @@ CheckForUpdatesOnline(isManual := true) {
         error: ""
     }
 
+    localTimeInt := IsoToTimestamp(CurrentBuildTime)
+
+    ; 1. 优先检测 GitHub Latest Release (正式版本发布)
     try {
-        whr := ComObject("WinHttp.WinHttpRequest.5.1")
-        whr.SetTimeouts(5000, 5000, 8000, 8000)
-
-        ; 1. 优先检测 GitHub Latest Release (正式版本发布)
+        whr1 := ComObject("WinHttp.WinHttpRequest.5.1")
+        whr1.SetTimeouts(4000, 4000, 6000, 6000)
         releaseUrl := GITHUB_API_URL . "/releases/latest"
-        whr.Open("GET", releaseUrl, false)
-        whr.SetRequestHeader("User-Agent", "AutoIME-App")
-        whr.Send()
+        whr1.Open("GET", releaseUrl, false)
+        whr1.SetRequestHeader("User-Agent", "AutoIME-App")
+        whr1.Send()
 
-        if (whr.Status == 200) {
-            data := JSON.parse(whr.ResponseText)
+        if (whr1.Status == 200) {
+            data := JSON.parse(whr1.ResponseText)
             tagName := data.Has("tag_name") ? data["tag_name"] : ""
             body := data.Has("body") ? data["body"] : ""
             htmlUrl := data.Has("html_url") ? data["html_url"] : ""
@@ -52,10 +62,10 @@ CheckForUpdatesOnline(isManual := true) {
             if (downloadUrl == "" && tagName != "")
                 downloadUrl := "https://github.com/" . GITHUB_REPO . "/archive/refs/tags/" . tagName . ".zip"
 
-            ; 时间比对校验：若 Release 发布时间晚于本地构建时间，或 tag 名称更新
+            remoteTimeInt := IsoToTimestamp(publishedAt)
             isNewer := false
-            if (publishedAt != "" && CurrentBuildTime != "") {
-                isNewer := (publishedAt > CurrentBuildTime)
+            if (remoteTimeInt > 0 && localTimeInt > 0) {
+                isNewer := (remoteTimeInt > localTimeInt)
             } else if (tagName != "") {
                 isNewer := (tagName != CurrentVersion && !InStr(tagName, CurrentCommit))
             }
@@ -70,15 +80,21 @@ CheckForUpdatesOnline(isManual := true) {
                 return res
             }
         }
+    } catch as err1 {
+        ; Release 不存在或网络异常时正常降级回退到 commits 检测
+    }
 
-        ; 2. 若无正式 Release，降级检测 main 分支最新 Commit 提交记录与时间
+    ; 2. 若无正式 Release，降级检测 main 分支最新 Commit 提交记录与时间
+    try {
+        whr2 := ComObject("WinHttp.WinHttpRequest.5.1")
+        whr2.SetTimeouts(4000, 4000, 6000, 6000)
         commitUrl := GITHUB_API_URL . "/commits/main"
-        whr.Open("GET", commitUrl, false)
-        whr.SetRequestHeader("User-Agent", "AutoIME-App")
-        whr.Send()
+        whr2.Open("GET", commitUrl, false)
+        whr2.SetRequestHeader("User-Agent", "AutoIME-App")
+        whr2.Send()
 
-        if (whr.Status == 200) {
-            cData := JSON.parse(whr.ResponseText)
+        if (whr2.Status == 200) {
+            cData := JSON.parse(whr2.ResponseText)
             remoteSha := cData.Has("sha") ? cData["sha"] : ""
             remoteShaShort := SubStr(remoteSha, 1, 7)
             
@@ -91,9 +107,10 @@ CheckForUpdatesOnline(isManual := true) {
             cMsg := (cData.Has("commit") && cData["commit"].Has("message")) ? cData["commit"]["message"] : ""
             cHtml := cData.Has("html_url") ? cData["html_url"] : ""
 
+            remoteTimeInt := IsoToTimestamp(commitDate)
             isNewer := false
-            if (commitDate != "" && CurrentBuildTime != "") {
-                isNewer := (commitDate > CurrentBuildTime)
+            if (remoteTimeInt > 0 && localTimeInt > 0) {
+                isNewer := (remoteTimeInt > localTimeInt)
             } else if (remoteShaShort != "") {
                 isNewer := (remoteShaShort != CurrentCommit && CurrentCommit != "dev")
             }
@@ -108,8 +125,8 @@ CheckForUpdatesOnline(isManual := true) {
                 return res
             }
         }
-    } catch as err {
-        res.error := err.Message
+    } catch as err2 {
+        res.error := err2.Message
     }
 
     return res

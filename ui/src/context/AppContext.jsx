@@ -421,48 +421,103 @@ export function AppProvider({ children }) {
     }
   }, [ahk]);
 
-  // 检查在线更新
-  const checkUpdate = useCallback((isManual = true) => {
+  // 检查在线更新 (AHK 原生通道 + 浏览器 Chromium Fetch 双通道自动冗余)
+  const checkUpdate = useCallback(async (isManual = true) => {
     if (isManual) {
       showToast(t('update_checking'), 'info');
     }
 
-    if (!ahk || typeof ahk.CheckForUpdates !== 'function') {
-      setTimeout(() => {
-        showToast(t('update_latest', `${currentVersion} #${currentCommit}`), 'success');
-      }, 500);
-      return;
-    }
+    let res = null;
 
-    try {
-      const resJson = ahk.CheckForUpdates();
-      const res = JSON.parse(resJson);
-
-      if (res.hasUpdate) {
-        setUpdateModal({
-          isOpen: true,
-          hasUpdate: true,
-          latestVersion: res.latestVersion || currentVersion,
-          latestCommit: res.latestCommit || '',
-          latestTime: res.latestTime || '',
-          message: res.message || '',
-          downloadUrl: res.downloadUrl || '',
-          htmlUrl: res.htmlUrl || '',
-          isUpdating: false
-        });
-        showToast(t('update_available', res.latestVersion || (res.latestCommit ? `#${res.latestCommit}` : '新版本')), 'warning');
-      } else if (res.error) {
-        showToast(t('update_failed', res.error), 'danger');
-      } else if (isManual) {
-        showToast(t('update_latest', `${currentVersion} #${currentCommit}`), 'success');
-      }
-    } catch (err) {
-      console.error('Update check failed:', err);
-      if (isManual) {
-        showToast(t('update_failed', err.message), 'danger');
+    // 1. 优先尝试通过 AHK 原生桥梁检测
+    if (ahk && typeof ahk.CheckForUpdates === 'function') {
+      try {
+        const resJson = ahk.CheckForUpdates();
+        if (resJson) {
+          const parsed = JSON.parse(resJson);
+          if (parsed && !parsed.error) {
+            res = parsed;
+          }
+        }
+      } catch (err) {
+        console.warn('AHK CheckForUpdates exception, fallback to browser fetch:', err);
       }
     }
-  }, [ahk, currentVersion, currentCommit, showToast, t]);
+
+    // 2. 若 AHK 检测未成功或有异常，无缝降级采用 Chromium 浏览器原生 fetch 网络栈 (走系统代理)
+    if (!res || res.error) {
+      try {
+        let releaseData = null;
+        try {
+          const rRes = await fetch('https://api.github.com/repos/kyuuseiryuu/AutoIME/releases/latest');
+          if (rRes.ok) releaseData = await rRes.json();
+        } catch {}
+
+        if (releaseData && releaseData.tag_name) {
+          const publishedAt = releaseData.published_at || releaseData.created_at || '';
+          const isNewer = currentBuildTime && publishedAt ? publishedAt > currentBuildTime : releaseData.tag_name !== currentVersion;
+          const downloadUrl = releaseData.assets?.find((a) => a.name?.endsWith('.zip'))?.browser_download_url
+            || releaseData.zipball_url
+            || `https://github.com/kyuuseiryuu/AutoIME/archive/refs/tags/${releaseData.tag_name}.zip`;
+
+          res = {
+            hasUpdate: isNewer,
+            latestVersion: releaseData.tag_name,
+            latestTime: publishedAt,
+            message: releaseData.body || '',
+            downloadUrl: downloadUrl,
+            htmlUrl: releaseData.html_url || '',
+            error: ''
+          };
+        } else {
+          // 若暂无正式 Release，回退检测 main 分支最新 commit
+          const cRes = await fetch('https://api.github.com/repos/kyuuseiryuu/AutoIME/commits/main');
+          if (cRes.ok) {
+            const cData = await cRes.json();
+            const remoteShaShort = cData.sha ? cData.sha.substring(0, 7) : '';
+            const commitDate = cData.commit?.committer?.date || cData.commit?.author?.date || '';
+            const isNewer = currentBuildTime && commitDate
+              ? commitDate > currentBuildTime
+              : (remoteShaShort !== currentCommit && currentCommit !== 'dev');
+
+            res = {
+              hasUpdate: isNewer,
+              latestCommit: remoteShaShort,
+              latestTime: commitDate,
+              message: cData.commit?.message || '',
+              downloadUrl: 'https://github.com/kyuuseiryuu/AutoIME/archive/refs/heads/main.zip',
+              htmlUrl: cData.html_url || '',
+              error: ''
+            };
+          }
+        }
+      } catch (fetchErr) {
+        console.error('Browser fetch update check failed:', fetchErr);
+        if (!res) {
+          res = { error: fetchErr.message };
+        }
+      }
+    }
+
+    if (res && res.hasUpdate) {
+      setUpdateModal({
+        isOpen: true,
+        hasUpdate: true,
+        latestVersion: res.latestVersion || currentVersion,
+        latestCommit: res.latestCommit || '',
+        latestTime: res.latestTime || '',
+        message: res.message || '',
+        downloadUrl: res.downloadUrl || '',
+        htmlUrl: res.htmlUrl || '',
+        isUpdating: false
+      });
+      showToast(t('update_available', res.latestVersion || (res.latestCommit ? `#${res.latestCommit}` : '新版本')), 'warning');
+    } else if (res && res.error) {
+      showToast(t('update_failed', res.error), 'danger');
+    } else if (isManual) {
+      showToast(t('update_latest', `${currentVersion} #${currentCommit}`), 'success');
+    }
+  }, [ahk, currentVersion, currentCommit, currentBuildTime, showToast, t]);
 
   // 执行在线更新
   const applyUpdate = useCallback((downloadUrl) => {

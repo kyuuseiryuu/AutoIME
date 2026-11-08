@@ -1,4 +1,4 @@
-$ErrorActionPreference = 'Stop'
+﻿$ErrorActionPreference = 'Stop'
 
 $rootDir = Split-Path -Parent $PSScriptRoot
 $libDir = Join-Path $rootDir "lib\WebView2"
@@ -6,11 +6,11 @@ $dll64 = Join-Path $libDir "64bit\WebView2Loader.dll"
 $dll32 = Join-Path $libDir "32bit\WebView2Loader.dll"
 
 if ((Test-Path $dll64) -and (Test-Path $dll32)) {
-    Write-Host "✅ WebView2Loader.dll already present in lib\WebView2"
+    Write-Host "[OK] WebView2Loader.dll already present in lib\WebView2"
     exit 0
 }
 
-Write-Host "📥 Downloading WebView2Loader.dll from Microsoft.Web.WebView2 NuGet package..."
+Write-Host "[INFO] Downloading WebView2Loader.dll from Microsoft.Web.WebView2 NuGet package..."
 
 if (-not (Test-Path (Join-Path $libDir "64bit"))) { New-Item -ItemType Directory -Path (Join-Path $libDir "64bit") -Force | Out-Null }
 if (-not (Test-Path (Join-Path $libDir "32bit"))) { New-Item -ItemType Directory -Path (Join-Path $libDir "32bit") -Force | Out-Null }
@@ -31,11 +31,11 @@ try {
     
     if (Test-Path $src64) {
         Copy-Item -Path $src64 -Destination $dll64 -Force
-        Write-Host "✅ Installed 64-bit WebView2Loader.dll to $dll64"
+        Write-Host "[OK] Installed 64-bit WebView2Loader.dll to $dll64"
     }
     if (Test-Path $src32) {
         Copy-Item -Path $src32 -Destination $dll32 -Force
-        Write-Host "✅ Installed 32-bit WebView2Loader.dll to $dll32"
+        Write-Host "[OK] Installed 32-bit WebView2Loader.dll to $dll32"
     }
 }
 finally {
