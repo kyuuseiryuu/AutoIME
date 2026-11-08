@@ -83,7 +83,7 @@ jobs:
           Copy-Item "ui/html/style.css" "$pkgDir/ui/html/"
           Copy-Item "ui/html/app.bundle.js" "$pkgDir/ui/html/"
 
-          Copy-Item "lib/JSON.ahk" "$pkgDir/lib/"
+          Copy-Item "lib/*.ahk" "$pkgDir/lib/"
           Copy-Item "lib/WebView2/WebView2.ahk" "$pkgDir/lib/WebView2/"
           Copy-Item "lib/WebView2/32bit/WebView2Loader.dll" "$pkgDir/lib/WebView2/32bit/"
           Copy-Item "lib/WebView2/64bit/WebView2Loader.dll" "$pkgDir/lib/WebView2/64bit/"
