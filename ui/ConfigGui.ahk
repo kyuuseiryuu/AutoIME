@@ -108,7 +108,7 @@ CreateAutoImeHostBridge() {
 }
 
 Bridge_GetInitialDataJson() {
-    global ImeTabList, CurrentLang, CurrentTheme, CurrentVersion, CurrentCommit, AvailableLangs, CurrentHotkey, DEBUG_MODE, AutoStartLnk, CurrentDict, FallbackDict
+    global ImeTabList, CurrentLang, CurrentTheme, CurrentVersion, CurrentCommit, CurrentBuildTime, AvailableLangs, CurrentHotkey, DEBUG_MODE, AutoStartLnk, CurrentDict, FallbackDict
 
     systemImesData := []
     for tab in ImeTabList {
@@ -136,6 +136,7 @@ Bridge_GetInitialDataJson() {
         theme: CurrentTheme,
         currentVersion: CurrentVersion,
         currentCommit: CurrentCommit,
+        currentBuildTime: CurrentBuildTime,
         availableLangs: AvailableLangs,
         currentHotkey: CurrentHotkey,
         debugMode: DEBUG_MODE ? 1 : 0,

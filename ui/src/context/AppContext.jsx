@@ -8,8 +8,9 @@ export function AppProvider({ children }) {
   const ahk = useMemo(() => window.chrome?.webview?.hostObjects?.sync?.ahk, []);
 
   // 核心状态
-  const [currentVersion, setCurrentVersion] = useState(process.env.APP_VERSION || 'v2.0');
-  const [currentCommit, setCurrentCommit] = useState(process.env.COMMIT_HASH || '896a76b');
+  const [currentVersion, setCurrentVersion] = useState(process.env.APP_VERSION || 'v2.0.0');
+  const [currentCommit, setCurrentCommit] = useState(process.env.COMMIT_HASH || 'dev');
+  const [currentBuildTime, setCurrentBuildTime] = useState(process.env.BUILD_TIME || '');
   const [systemImes, setSystemImes] = useState([]);
   const [activeTabIdx, setActiveTabIdx] = useState(0);
   const [currentLang, setCurrentLang] = useState('zh');
@@ -99,6 +100,9 @@ export function AppProvider({ children }) {
       }
       if (data.currentCommit) {
         setCurrentCommit(data.currentCommit);
+      }
+      if (data.currentBuildTime) {
+        setCurrentBuildTime(data.currentBuildTime);
       }
 
       // 同步主题设置
@@ -440,12 +444,13 @@ export function AppProvider({ children }) {
           hasUpdate: true,
           latestVersion: res.latestVersion || currentVersion,
           latestCommit: res.latestCommit || '',
+          latestTime: res.latestTime || '',
           message: res.message || '',
           downloadUrl: res.downloadUrl || '',
           htmlUrl: res.htmlUrl || '',
           isUpdating: false
         });
-        showToast(t('update_available', res.latestVersion || res.latestCommit), 'warning');
+        showToast(t('update_available', res.latestVersion || (res.latestCommit ? `#${res.latestCommit}` : '新版本')), 'warning');
       } else if (res.error) {
         showToast(t('update_failed', res.error), 'danger');
       } else if (isManual) {
@@ -541,6 +546,7 @@ export function AppProvider({ children }) {
   const value = {
     currentVersion,
     currentCommit,
+    currentBuildTime,
     updateModal,
     checkUpdate,
     applyUpdate,

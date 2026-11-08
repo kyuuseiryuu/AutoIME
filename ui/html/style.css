@@ -1225,6 +1225,18 @@ kbd {
   color: var(--primary);
 }
 
+.update-time-tag {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  margin-top: 2px;
+}
+
+.update-time-new {
+  color: var(--primary);
+  font-weight: 500;
+}
+
 .update-version-arrow {
   font-size: 18px;
   color: var(--text-muted);

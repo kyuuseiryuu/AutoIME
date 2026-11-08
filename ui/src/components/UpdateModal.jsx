@@ -1,8 +1,27 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
 
+function formatDateTime(iso) {
+  if (!iso) return '-';
+  try {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    return d.toLocaleString(undefined, {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    });
+  } catch {
+    return iso;
+  }
+}
+
 export function UpdateModal() {
-  const { updateModal, closeUpdateModal, applyUpdate, currentVersion, currentCommit, t } = useApp();
+  const { updateModal, closeUpdateModal, applyUpdate, currentVersion, currentCommit, currentBuildTime, t } = useApp();
 
   if (!updateModal.isOpen) return null;
 
@@ -22,23 +41,33 @@ export function UpdateModal() {
         </div>
 
         <div className="modal-body">
-          {/* 版本对比信息 */}
+          {/* 版本与时间对比信息 */}
           <div className="update-version-card">
             <div className="update-version-col">
-              <span className="update-version-label">当前版本</span>
+              <span className="update-version-label">当前本地版本</span>
               <span className="update-version-val">{currentVersion} <small>#{currentCommit}</small></span>
+              {currentBuildTime && (
+                <span className="update-time-tag" title="本地构建/提交时间">
+                  🕒 {formatDateTime(currentBuildTime)}
+                </span>
+              )}
             </div>
             <div className="update-version-arrow">➔</div>
             <div className="update-version-col update-version-new">
-              <span className="update-version-label">最新版本</span>
+              <span className="update-version-label">GitHub 最新发布</span>
               <span className="update-version-val">{targetVer} {targetCommit && <small>#{targetCommit}</small>}</span>
+              {updateModal.latestTime && (
+                <span className="update-time-tag update-time-new" title="GitHub Release 发布/Commit 提交时间">
+                  ✨ {formatDateTime(updateModal.latestTime)}
+                </span>
+              )}
             </div>
           </div>
 
           {/* 更新日志/摘要说明 */}
           {updateModal.message && (
             <div className="update-changelog-box">
-              <div className="update-changelog-title">📋 更新摘要 / Commit Message:</div>
+              <div className="update-changelog-title">📋 发布说明 / Commit Message:</div>
               <pre className="update-changelog-text">{updateModal.message}</pre>
             </div>
           )}
@@ -79,7 +108,7 @@ export function UpdateModal() {
                 </button>
               </>
             ) : (
-              <span className="text-muted" style={{ fontSize: '13px' }}>请勿关闭窗口，正在更新...</span>
+              <span className="text-muted" style={{ fontSize: '13px' }}>请勿关闭窗口，正在自动更新并重启...</span>
             )}
           </div>
         </div>
@@ -87,4 +116,3 @@ export function UpdateModal() {
     </div>
   );
 }
-

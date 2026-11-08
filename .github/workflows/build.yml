@@ -20,7 +20,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get short commit hash
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Get short commit hash and dynamic version
         id: vars
         shell: bash
         run: |
@@ -28,11 +34,15 @@ jobs:
           echo "sha_short=$SHORT_SHA" >> $GITHUB_OUTPUT
           echo "Current Short SHA: $SHORT_SHA"
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
+          # 动态解析版本号 (优先读取 Git 标签，否则结合 package.json 与 short sha)
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            VER="${{ github.ref_name }}"
+          else
+            PKG_VER=$(node -p "require('./package.json').version")
+            VER="v${PKG_VER}-${SHORT_SHA}"
+          fi
+          echo "version=$VER" >> $GITHUB_OUTPUT
+          echo "Resolved Version: $VER"
 
       - name: Install dependencies
         run: npm ci
@@ -41,6 +51,7 @@ jobs:
         run: npm run build
         env:
           COMMIT_HASH: ${{ steps.vars.outputs.sha_short }}
+          APP_VERSION: ${{ steps.vars.outputs.version }}
 
       - name: Assemble release package
         shell: pwsh
@@ -94,14 +105,13 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || format('v2.0-{0}', steps.vars.outputs.sha_short) }}
-          name: AutoIME ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || format('v2.0 #{0}', steps.vars.outputs.sha_short) }}
+          tag_name: ${{ steps.vars.outputs.version }}
+          name: AutoIME ${{ steps.vars.outputs.version }}
           body: |
             ### AutoIME 自动化持续构建发布 (CI)
             - **Commit**: [${{ steps.vars.outputs.sha_short }}](https://github.com/kyuuseiryuu/AutoIME/commit/${{ github.sha }})
-            - **版本识别**: `${{ steps.vars.outputs.sha_short }}`
+            - **发布版本**: `${{ steps.vars.outputs.version }}`
             - **打包清单**: 仅包含运行必需的 AHK 核心模块、现代 WebView2 离线资源包及语言字典。
           files: AutoIME-${{ steps.vars.outputs.sha_short }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-

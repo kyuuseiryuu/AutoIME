@@ -5,7 +5,7 @@
 ; ==============================================================================
 
 LoadConfig() {
-    global SystemImes, AppToImeMap, ImeTabList, DEBUG_MODE, CurrentLang, CurrentHotkey, CurrentTheme, CurrentVersion, CurrentCommit, ConfigFile, AvailableLangs
+    global SystemImes, AppToImeMap, ImeTabList, DEBUG_MODE, CurrentLang, CurrentHotkey, CurrentTheme, CurrentVersion, CurrentCommit, CurrentBuildTime, ConfigFile, AvailableLangs
 
     ; 读取 version.json 动态注入的版本信息
     try {
@@ -16,6 +16,8 @@ LoadConfig() {
                 CurrentVersion := vData["version"]
             if vData.Has("commit") && vData["commit"] != ""
                 CurrentCommit := vData["commit"]
+            if vData.Has("buildTime") && vData["buildTime"] != ""
+                CurrentBuildTime := vData["buildTime"]
         }
     }
     
